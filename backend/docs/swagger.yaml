@@ -1,0 +1,635 @@
+definitions:
+  models.Ingredient:
+    properties:
+      ingredient_description:
+        type: string
+      ingredient_id:
+        type: integer
+      ingredient_name:
+        type: string
+    type: object
+  models.Recipe:
+    properties:
+      cook_time:
+        type: integer
+      recipe_description:
+        type: string
+      recipe_id:
+        type: integer
+      recipe_name:
+        type: string
+    type: object
+  models.RecipeIngredient:
+    properties:
+      ingredient_id:
+        type: integer
+      measurement:
+        type: string
+      quantity:
+        type: number
+      recipe_id:
+        type: integer
+      recipe_ingredient_id:
+        type: integer
+    type: object
+  models.RecipeStep:
+    properties:
+      recipe_id:
+        type: integer
+      recipe_step_id:
+        type: integer
+      step_description:
+        type: string
+      step_id:
+        type: integer
+      step_number:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /ingredients:
+    post:
+      consumes:
+      - application/json
+      description: Add a new ingredient to the database
+      parameters:
+      - description: Add ingredient
+        in: body
+        name: ingredient
+        required: true
+        schema:
+          $ref: '#/definitions/models.Ingredient'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Ingredient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new ingredient
+      tags:
+      - ingredients
+  /ingredients/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove an ingredient by ID from the database
+      parameters:
+      - description: Ingredient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Ingredient deleted
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete an ingredient
+      tags:
+      - ingredients
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific ingredient by ID
+      parameters:
+      - description: Ingredient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ingredient retrieved
+          schema:
+            $ref: '#/definitions/models.Ingredient'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Ingredient not found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a single ingredient
+      tags:
+      - ingredients
+    put:
+      consumes:
+      - application/json
+      description: Update an ingredient by ID
+      parameters:
+      - description: Ingredient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Ingredient content
+        in: body
+        name: ingredient
+        required: true
+        schema:
+          $ref: '#/definitions/models.Ingredient'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Ingredient updated
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update an existing ingredient
+      tags:
+      - ingredients
+  /recipe-ingredients:
+    get:
+      consumes:
+      - application/json
+      description: Get all recipe ingredients from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RecipeIngredient'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all recipe ingredients
+      tags:
+      - recipe_ingredients
+    post:
+      consumes:
+      - application/json
+      description: Add a new recipe ingredient to the database
+      parameters:
+      - description: Add recipe ingredient
+        in: body
+        name: recipe_ingredient
+        required: true
+        schema:
+          $ref: '#/definitions/models.RecipeIngredient'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.RecipeIngredient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new recipe ingredient
+      tags:
+      - recipe_ingredients
+  /recipe-ingredients/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a recipe ingredient by ID from the database
+      parameters:
+      - description: Recipe Ingredient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Recipe ingredient deleted
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Recipe ingredient not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a recipe ingredient
+      tags:
+      - recipe_ingredients
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific recipe ingredient by ID
+      parameters:
+      - description: Recipe Ingredient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recipe ingredient retrieved
+          schema:
+            $ref: '#/definitions/models.RecipeIngredient'
+        "400":
+          description: Invalid ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Recipe ingredient not found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a single recipe ingredient
+      tags:
+      - recipe_ingredients
+    put:
+      consumes:
+      - application/json
+      description: Update a recipe ingredient by ID
+      parameters:
+      - description: Recipe Ingredient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update recipe ingredient
+        in: body
+        name: recipe_ingredient
+        required: true
+        schema:
+          $ref: '#/definitions/models.RecipeIngredient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RecipeIngredient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a recipe ingredient
+      tags:
+      - recipe_ingredients
+  /recipe-steps:
+    post:
+      consumes:
+      - application/json
+      description: Add a new recipe step to the database
+      parameters:
+      - description: Add recipe step
+        in: body
+        name: recipe_step
+        required: true
+        schema:
+          $ref: '#/definitions/models.RecipeStep'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.RecipeStep'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new recipe step
+      tags:
+      - recipe_steps
+  /recipe-steps/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a recipe step from the database
+      parameters:
+      - description: Recipe Step ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a recipe step
+      tags:
+      - recipe_steps
+    get:
+      consumes:
+      - application/json
+      description: Get a single recipe step from the database by ID
+      parameters:
+      - description: Recipe Step ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RecipeStep'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a recipe step by ID
+      tags:
+      - recipe_steps
+    put:
+      consumes:
+      - application/json
+      description: Update a recipe step by ID
+      parameters:
+      - description: Recipe Step ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update recipe step
+        in: body
+        name: recipe_step
+        required: true
+        schema:
+          $ref: '#/definitions/models.RecipeStep'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RecipeStep'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a recipe step
+      tags:
+      - recipe_steps
+  /recipes:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all recipes from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Recipe'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all recipes
+      tags:
+      - recipes
+    post:
+      consumes:
+      - application/json
+      description: Add a new recipe to the database
+      parameters:
+      - description: Add recipe
+        in: body
+        name: recipe
+        required: true
+        schema:
+          $ref: '#/definitions/models.Recipe'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Recipe'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new recipe
+      tags:
+      - recipes
+  /recipes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a recipe from the database by ID
+      parameters:
+      - description: Recipe ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Recipe deleted
+        "400":
+          description: Invalid recipe ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Recipe not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a recipe by ID
+      tags:
+      - recipes
+    get:
+      consumes:
+      - application/json
+      description: Get a single recipe from the database by ID
+      parameters:
+      - description: Recipe ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Recipe'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a recipe by ID
+      tags:
+      - recipes
+    put:
+      consumes:
+      - application/json
+      description: Update an existing recipe by ID
+      parameters:
+      - description: Recipe ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update recipe
+        in: body
+        name: recipe
+        required: true
+        schema:
+          $ref: '#/definitions/models.Recipe'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recipe updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid recipe ID
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Recipe not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a recipe by ID
+      tags:
+      - recipes
+swagger: "2.0"
