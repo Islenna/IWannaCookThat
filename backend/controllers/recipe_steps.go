@@ -17,14 +17,14 @@ import (
 // @Tags recipe_steps
 // @Accept json
 // @Produce json
-// @Param recipe_step body models.RecipeStep true "Add recipe step"
+// @Param recipe_step body models.RecipeStepRequest true "Add recipe step"
 // @Success 201 {object} models.RecipeStep
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /recipe-steps [post]
 func CreateRecipeStep(c *gin.Context, db *sql.DB) {
 	// 1. Define a variable to hold the recipe step data.
-	var recipeStep models.RecipeStep
+	var recipeStep models.RecipeStepRequest
 
 	// 2. Bind the request JSON to the recipe step struct.
 	if err := c.ShouldBindJSON(&recipeStep); err != nil {

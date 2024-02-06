@@ -1,5 +1,12 @@
 package models
 
+type RecipeIngredientRequest struct {
+	RecipeID     int     `json:"recipe_id" binding:"required"`
+	IngredientID int     `json:"ingredient_id" binding:"required"`
+	Quantity     float64 `json:"quantity" binding:"required"`
+	Measurement  string  `json:"measurement" binding:"required"`
+}
+
 type RecipeIngredient struct {
 	RecipeID           int     `json:"recipe_id" db:"recipe_id"`
 	IngredientID       int     `json:"ingredient_id" db:"ingredient_id"`

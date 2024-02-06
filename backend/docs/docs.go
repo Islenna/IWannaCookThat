@@ -16,6 +16,37 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/ingredients": {
+            "get": {
+                "description": "Get all ingredients from the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ingredients"
+                ],
+                "summary": "Get all ingredients",
+                "responses": {
+                    "200": {
+                        "description": "List of ingredients",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Ingredient"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Add a new ingredient to the database",
                 "consumes": [
@@ -35,7 +66,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Ingredient"
+                            "$ref": "#/definitions/models.IngredientRequest"
                         }
                     }
                 ],
@@ -251,7 +282,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RecipeIngredient"
+                            "$ref": "#/definitions/models.RecipeIngredientRequest"
                         }
                     }
                 ],
@@ -453,7 +484,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.RecipeStep"
+                            "$ref": "#/definitions/models.RecipeStepRequest"
                         }
                     }
                 ],
@@ -686,7 +717,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Recipe"
+                            "$ref": "#/definitions/models.RecipeRequest"
                         }
                     }
                 ],
@@ -892,6 +923,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.IngredientRequest": {
+            "type": "object",
+            "required": [
+                "ingredient_name"
+            ],
+            "properties": {
+                "ingredient_description": {
+                    "type": "string"
+                },
+                "ingredient_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Recipe": {
             "type": "object",
             "properties": {
@@ -929,6 +974,43 @@ const docTemplate = `{
                 }
             }
         },
+        "models.RecipeIngredientRequest": {
+            "type": "object",
+            "required": [
+                "ingredient_id",
+                "measurement",
+                "quantity",
+                "recipe_id"
+            ],
+            "properties": {
+                "ingredient_id": {
+                    "type": "integer"
+                },
+                "measurement": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "recipe_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RecipeRequest": {
+            "type": "object",
+            "properties": {
+                "cook_time": {
+                    "type": "integer"
+                },
+                "recipe_description": {
+                    "type": "string"
+                },
+                "recipe_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.RecipeStep": {
             "type": "object",
             "properties": {
@@ -943,6 +1025,23 @@ const docTemplate = `{
                 },
                 "step_id": {
                     "type": "integer"
+                },
+                "step_number": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RecipeStepRequest": {
+            "type": "object",
+            "properties": {
+                "recipe_id": {
+                    "type": "integer"
+                },
+                "recipe_step_id": {
+                    "type": "integer"
+                },
+                "step_description": {
+                    "type": "string"
                 },
                 "step_number": {
                     "type": "integer"

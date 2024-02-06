@@ -88,6 +88,4 @@ func InitDB() (*sql.DB, error) {
 	fmt.Println("Successfully connected!")
 	return db, nil // Return the database instance and no error
 
-	return db, nil
-
 }

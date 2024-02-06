@@ -17,14 +17,14 @@ import (
 // @Tags recipes
 // @Accept json
 // @Produce json
-// @Param recipe body models.Recipe true "Add recipe"
+// @Param recipe body models.RecipeRequest true "Add recipe"
 // @Success 201 {object} models.Recipe
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /recipes [post]
 func CreateRecipe(c *gin.Context, db *sql.DB) {
 	// 1. Define a variable to hold the recipe data.
-	var recipe models.Recipe
+	var recipe models.RecipeRequest
 
 	// 2. Bind the request JSON to the recipe struct.
 	if err := c.ShouldBindJSON(&recipe); err != nil {

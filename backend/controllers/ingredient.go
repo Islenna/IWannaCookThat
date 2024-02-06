@@ -3,6 +3,7 @@ package controllers
 import (
 	"backend/models" // Import your models package where you have your struct definitions
 	"database/sql"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -17,26 +18,26 @@ import (
 // @Tags ingredients
 // @Accept json
 // @Produce json
-// @Param ingredient body models.Ingredient true "Add ingredient"
+// @Param ingredient body models.IngredientRequest true "Add ingredient"
 // @Success 201 {object} models.Ingredient
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /ingredients [post]
 func CreateIngredient(c *gin.Context, db *sql.DB) {
-	// 1. Define a variable to hold the ingredient data.
-	var ingredient models.Ingredient
+	// 1. Define a variable to hold the ingredient request data.
+	var ingredientReq models.IngredientRequest
 
-	// 2. Bind the request JSON to the ingredient struct.
-	if err := c.ShouldBindJSON(&ingredient); err != nil {
+	// 2. Bind the request JSON to the ingredient request struct.
+	if err := c.ShouldBindJSON(&ingredientReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// 3. Perform validation and save the ingredient to the database.
 	sqlQuery := `
-		INSERT INTO ingredients (ingredient_name, ingredient_description)
-		VALUES ($1, $2)
-		RETURNING ingredient_id`
+        INSERT INTO ingredients (ingredient_name, ingredient_description)
+        VALUES ($1, $2)
+        RETURNING ingredient_id`
 
 	stmt, err := db.Prepare(sqlQuery)
 	if err != nil {
@@ -45,7 +46,7 @@ func CreateIngredient(c *gin.Context, db *sql.DB) {
 	}
 	defer stmt.Close()
 	var ingredientID int
-	err = stmt.QueryRow(ingredient.IngredientName, ingredient.IngredientDescription).Scan(&ingredientID)
+	err = stmt.QueryRow(ingredientReq.IngredientName, ingredientReq.IngredientDescription).Scan(&ingredientID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error executing SQL statement"})
 		return
@@ -54,8 +55,8 @@ func CreateIngredient(c *gin.Context, db *sql.DB) {
 	// 4. Return a JSON response with the created ingredient.
 	createdIngredient := models.Ingredient{
 		IngredientID:          ingredientID,
-		IngredientName:        ingredient.IngredientName,
-		IngredientDescription: ingredient.IngredientDescription,
+		IngredientName:        ingredientReq.IngredientName,
+		IngredientDescription: ingredientReq.IngredientDescription,
 	}
 
 	c.JSON(http.StatusCreated, createdIngredient)
@@ -86,14 +87,57 @@ func GetIngredient(c *gin.Context, db *sql.DB) {
 	// 2. Query the database for the ingredient.
 	sqlQuery := `SELECT ingredient_id, ingredient_name, ingredient_description FROM ingredients WHERE ingredient_id = $1`
 	var ingredient models.Ingredient
-	err = db.QueryRow(sqlQuery, ingredientID).Scan(&ingredient.IngredientID, &ingredient.IngredientName, &ingredient.IngredientDescription)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Ingredient not found"})
+	if err := db.QueryRow(sqlQuery, ingredientID).Scan(&ingredient.IngredientID, &ingredient.IngredientName, &ingredient.IngredientDescription); err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Ingredient not found"})
+		} else {
+			log.Printf("Error scanning ingredient: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving ingredient"})
+		}
 		return
 	}
 
 	// 3. Return a JSON response with the retrieved ingredient.
+	log.Printf("Retrieved ingredient: %#v", ingredient)
 	c.JSON(http.StatusOK, ingredient)
+}
+
+// GetAllIngredients retrieves all ingredients from the database.
+// GetAllIngredients godoc
+// @Summary Get all ingredients
+// @Description Get all ingredients from the database
+// @Tags ingredients
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.Ingredient "List of ingredients"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Router /ingredients [get]
+func GetAllIngredients(c *gin.Context, db *sql.DB) {
+	// 1. Define a variable to hold the ingredient data.
+	var ingredient models.Ingredient
+	var ingredients []models.Ingredient
+
+	// 2. Query the database for all ingredients.
+	sqlQuery := `SELECT ingredient_id, ingredient_name, ingredient_description FROM ingredients`
+	rows, err := db.Query(sqlQuery)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error querying the database"})
+		return
+	}
+	defer rows.Close()
+
+	// 3. Iterate over the rows and add each ingredient to the slice.
+	for rows.Next() {
+		err := rows.Scan(&ingredient.IngredientID, &ingredient.IngredientName, &ingredient.IngredientDescription)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error scanning rows"})
+			return
+		}
+		ingredients = append(ingredients, ingredient)
+	}
+
+	// 4. Return a JSON response with the ingredients.
+	c.JSON(http.StatusOK, ingredients)
 }
 
 // UpdateIngredient updates an existing ingredient by ID.

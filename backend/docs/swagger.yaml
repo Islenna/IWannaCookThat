@@ -8,6 +8,15 @@ definitions:
       ingredient_name:
         type: string
     type: object
+  models.IngredientRequest:
+    properties:
+      ingredient_description:
+        type: string
+      ingredient_name:
+        type: string
+    required:
+    - ingredient_name
+    type: object
   models.Recipe:
     properties:
       cook_time:
@@ -32,6 +41,31 @@ definitions:
       recipe_ingredient_id:
         type: integer
     type: object
+  models.RecipeIngredientRequest:
+    properties:
+      ingredient_id:
+        type: integer
+      measurement:
+        type: string
+      quantity:
+        type: number
+      recipe_id:
+        type: integer
+    required:
+    - ingredient_id
+    - measurement
+    - quantity
+    - recipe_id
+    type: object
+  models.RecipeRequest:
+    properties:
+      cook_time:
+        type: integer
+      recipe_description:
+        type: string
+      recipe_name:
+        type: string
+    type: object
   models.RecipeStep:
     properties:
       recipe_id:
@@ -45,10 +79,42 @@ definitions:
       step_number:
         type: integer
     type: object
+  models.RecipeStepRequest:
+    properties:
+      recipe_id:
+        type: integer
+      recipe_step_id:
+        type: integer
+      step_description:
+        type: string
+      step_number:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
   /ingredients:
+    get:
+      consumes:
+      - application/json
+      description: Get all ingredients from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of ingredients
+          schema:
+            items:
+              $ref: '#/definitions/models.Ingredient'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all ingredients
+      tags:
+      - ingredients
     post:
       consumes:
       - application/json
@@ -59,7 +125,7 @@ paths:
         name: ingredient
         required: true
         schema:
-          $ref: '#/definitions/models.Ingredient'
+          $ref: '#/definitions/models.IngredientRequest'
       produces:
       - application/json
       responses:
@@ -205,7 +271,7 @@ paths:
         name: recipe_ingredient
         required: true
         schema:
-          $ref: '#/definitions/models.RecipeIngredient'
+          $ref: '#/definitions/models.RecipeIngredientRequest'
       produces:
       - application/json
       responses:
@@ -342,7 +408,7 @@ paths:
         name: recipe_step
         required: true
         schema:
-          $ref: '#/definitions/models.RecipeStep'
+          $ref: '#/definitions/models.RecipeStepRequest'
       produces:
       - application/json
       responses:
@@ -500,7 +566,7 @@ paths:
         name: recipe
         required: true
         schema:
-          $ref: '#/definitions/models.Recipe'
+          $ref: '#/definitions/models.RecipeRequest'
       produces:
       - application/json
       responses:
